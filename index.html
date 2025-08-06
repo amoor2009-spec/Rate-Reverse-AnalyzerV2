@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGS Scaffolding Rate Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #676c6c;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #f8f9fa;
+            color: #2c3e50;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #e74c3c;
+        }
+        
+        .logo-container {
+            width: 180px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .header-content {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            color: #495057;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .input-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .input-panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+        
+        .proposed-rate-input {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .results-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .feasibility-summary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .feasibility-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .feasible { color: #27ae60; }
+        .marginal { color: #f39c12; }
+        .not-feasible { color: #e74c3c; }
+        
+        .recommendation {
+            font-size: 1.2em;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .recommendation.increase {
+            background: #ffe0e0;
+            color: #c0392b;
+        }
+        
+        .recommendation.maintain {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .recommendation.decrease {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .metric-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .cost-table th,
+        .cost-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .cost-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background: #e9ecef;
+        }
+        
+        .chart-container {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 400px;
+            position: relative;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .info-box {
+            background: #e7f5ff;
+            border-left: 4px solid #339af0;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #155724;
+        }
+        
+        .export-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .export-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+        
+        .export-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .logo-container {
+                width: 120px;
+                height: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .metric-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .cost-table {
+                font-size: 14px;
+            }
+            
+            .export-btn {
+                margin: 10px 0;
+                font-size: 14px;
+            }
+            
+            .feasibility-score {
+                font-size: 2.5em;
+            }
+            
+            .recommendation {
+                font-size: 1em;
+                padding: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4em;
+            }
+            
+            .metric-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .cost-table {
+                font-size: 12px;
+            }
+            
+            .form-group input,
+            .form-group select {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://i.imgur.com/b2w4dbK.png" alt="RGS Logo">
+            </div>
+            <div class="header-content">
+                <h1>Scaffolding Rate Reverse Engineering Calculator</h1>
+                <p>RESA GULF SCAFFOLDING - Professional Reverse Engineering Method</p>
+            </div>
+            <div class="logo-container">
+                <img src="https://i.imgur.com/b2w4dbK.png" alt="RGS Logo">
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <div class="input-panel">
+                <h2>Input Parameters</h2>
+                
+                <div class="form-group">
+                    <label for="scaffoldType">Scaffold Type</label>
+                    <select id="scaffoldType" onchange="updateDefaults()">
+                        <option value="35|Sq.m|1.25|Independent Access">Independent Access Scaffold</option>
+                        <option value="286|Rising Meter|0.4|Column Access">Column Access Scaffold</option>
+                        <option value="717.33|Rising Meter|0.22|Liftable Column">Liftable Column Access Scaffold</option>
+                        <option value="30.76|m³|1.43|Buttress Support">Buttress Support Scaffold</option>
+                        <option value="39.58|m³|1.11|Birdcage">Birdcage</option>
+                        <option value="32.85|Sq.m|1.33|Bridged Access">Bridged Access</option>
+                        <option value="105.32|Sq.m in plan|0.56|Hanging">Hanging Scaffold</option>
+                        <option value="90.99|Sq.m in plan|0.63|Cantilever">Cantilever Scaffold</option>
+                        <option value="196.59|m³|0.45|Staircase">Staircase Access Scaffold</option>
+                        <option value="13.22|Sq.m in plan|3.33|Additional Platform">Additional Platform</option>
+                        <option value="39.98|Per unit|1.11|Loading Platform">Loading Platform (600kg/m²)</option>
+                        <option value="45|m³|0.67|Fixed Tower">Fixed Tower Scaffold</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="proposedRate">Your Proposed Rate (SAR/<span id="unitDisplay">Sq.m</span>)</label>
+                    <input type="number" id="proposedRate" class="proposed-rate-input" placeholder="Enter your rate" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productivity"><span id="unitDisplay2">Sq.m</span> per Manhour</label>
+                    <input type="number" id="productivity" value="1.25" step="0.1" style="background: #e3f2fd; border-color: #2196f3;">
+                    <small style="color: #666; display: block; margin-top: 5px;">Productivity rate based on your crew efficiency</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crewSize">Typical Crew Size</label>
+                    <input type="number" id="crewSize" value="4" min="1" max="20" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="laborRate">Labor Rate (SAR/hour)</label>
+                    <input type="number" id="laborRate" value="26" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="supervisorRate">Supervisor Rate (SAR/hour)</label>
+                    <input type="number" id="supervisorRate" value="64" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="materialCostPercent">Material Cost (% of labor)</label>
+                    <input type="number" id="materialCostPercent" value="35" step="5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="equipmentCostPercent">Equipment Cost (% of labor)</label>
+                    <input type="number" id="equipmentCostPercent" value="15" step="5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="overheadPercent">Overhead (%)</label>
+                    <input type="number" id="overheadPercent" value="12" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetProfitMargin">Target Profit Margin (%)</label>
+                    <input type="number" id="targetProfitMargin" value="15" step="1">
+                </div>
+                
+                <div style="border-top: 2px solid #e74c3c; margin: 25px 0 20px 0; padding-top: 20px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.2em;">Optional: Project Totals Calculator</h3>
+                    <div class="form-group">
+                        <label for="totalQuantity">Total Quantity (<span id="unitDisplay3">Sq.m</span>)</label>
+                        <input type="number" id="totalQuantity" placeholder="Enter total area/volume" step="0.1" style="background: #e8f5e9; border-color: #4caf50;">
+                    </div>
+                </div>
+                
+                <button class="analyze-btn" onclick="analyzeRate()">Let's do it</button>
+            </div>
+            
+            <div class="results-panel" id="resultsPanel" style="display: none;">
+                <div class="feasibility-summary">
+                    <h2>Feasibility Analysis</h2>
+                    <div class="feasibility-score" id="feasibilityScore">--</div>
+                    <div id="feasibilityStatus">Analyzing...</div>
+                    <div class="recommendation" id="recommendation"></div>
+                </div>
+                
+                <div class="metric-cards">
+                    <div class="metric-card">
+                        <div class="metric-label">Actual Profit Margin</div>
+                        <div class="metric-value" id="actualProfitMargin">--%</div>
+                    </div>
+                    <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="metric-label">Cost Coverage</div>
+                        <div class="metric-value" id="costCoverage">--%</div>
+                    </div>
+                    <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="metric-label">Productivity Rate</div>
+                        <div class="metric-value" id="productivityDisplay">--</div>
+                    </div>
+                    <div class="metric-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="metric-label">Rate vs Market</div>
+                        <div class="metric-value" id="marketComparison">--%</div>
+                    </div>
+                </div>
+                
+                <div class="breakdown-section">
+                    <h3>Detailed Cost Breakdown</h3>
+                    <table class="cost-table">
+                        <thead>
+                            <tr>
+                                <th>Cost Component</th>
+                                <th>Amount (SAR)</th>
+                                <th>% of Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="costBreakdown"></tbody>
+                    </table>
+                </div>
+                
+                <div class="breakdown-section">
+                    <h3>Labor Analysis</h3>
+                    <table class="cost-table">
+                        <thead>
+                            <tr>
+                                <th>Labor Component</th>
+                                <th>Hours</th>
+                                <th>Rate</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="laborBreakdown"></tbody>
+                    </table>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="costChart" width="400" height="400"></canvas>
+                </div>
+                
+                <div id="analysisMessages"></div>
+                
+                <div class="export-section">
+                    <button class="export-btn" onclick="exportAnalysis()">Export Analysis Report</button>
+                    <button class="export-btn" onclick="exportToExcel()">Export to Excel</button>
+                    <button class="export-btn" style="background: #e74c3c;" onclick="exportToPDF()">Share as PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateDefaults() {
+            const scaffoldType = document.getElementById('scaffoldType');
+            const selectedValue = scaffoldType.value.split('|');
+            const sorRate = parseFloat(selectedValue[0]);
+            const unit = selectedValue[1];
+            const suggestedProductivity = parseFloat(selectedValue[2]);
+            
+            document.getElementById('unitDisplay').textContent = unit;
+            document.getElementById('unitDisplay2').textContent = unit;
+            document.getElementById('unitDisplay3').textContent = unit;
+            
+            const proposedRate = sorRate * 0.85;
+            document.getElementById('proposedRate').value = proposedRate.toFixed(2);
+            document.getElementById('productivity').value = suggestedProductivity;
+            
+            let suggestedCrew = 4;
+            if (scaffoldType.selectedIndex === 1 || scaffoldType.selectedIndex === 2) {
+                suggestedCrew = 6;
+            } else if (scaffoldType.selectedIndex >= 6) {
+                suggestedCrew = 5;
+            }
+            document.getElementById('crewSize').value = suggestedCrew;
+        }
+        
+        function analyzeRate() {
+            const scaffoldType = document.getElementById('scaffoldType');
+            const selectedValue = scaffoldType.value.split('|');
+            const sorRate = parseFloat(selectedValue[0]);
+            const unit = selectedValue[1];
+            const scaffoldName = selectedValue[3];
+            
+            const proposedRate = parseFloat(document.getElementById('proposedRate').value);
+            const productivityRate = parseFloat(document.getElementById('productivity').value);
+            const actualManhours = 1 / productivityRate;
+            const crewSize = parseFloat(document.getElementById('crewSize').value);
+            const laborRate = parseFloat(document.getElementById('laborRate').value);
+            const supervisorRate = parseFloat(document.getElementById('supervisorRate').value);
+            const materialPercent = parseFloat(document.getElementById('materialCostPercent').value) / 100;
+            const equipmentPercent = parseFloat(document.getElementById('equipmentCostPercent').value) / 100;
+            const overheadPercent = parseFloat(document.getElementById('overheadPercent').value) / 100;
+            const targetProfitMargin = parseFloat(document.getElementById('targetProfitMargin').value) / 100;
+            
+            if (!proposedRate) {
+                alert('Please enter a proposed rate');
+                return;
+            }
+            
+            if (!productivityRate || productivityRate <= 0) {
+                alert('Please enter a valid productivity rate');
+                return;
+            }
+            
+            const actualLaborCost = actualManhours * laborRate;
+            const actualSupervisionCost = actualLaborCost * 0.15;
+            const actualMaterialCost = actualLaborCost * materialPercent;
+            const actualEquipmentCost = actualLaborCost * equipmentPercent;
+            const actualDirectCost = actualLaborCost + actualSupervisionCost + actualMaterialCost + actualEquipmentCost;
+            const actualOverhead = actualDirectCost * overheadPercent;
+            const actualTotalCost = actualDirectCost + actualOverhead;
+            
+            const actualProfit = proposedRate - actualTotalCost;
+            const actualProfitPercent = (actualProfit / actualTotalCost) * 100;
+            const costCoveragePercent = (proposedRate / actualTotalCost) * 100;
+            const marketComparisonPercent = (proposedRate / sorRate) * 100;
+            
+            let feasibilityScore = 0;
+            let status = '';
+            let recommendation = '';
+            
+            if (actualProfitPercent >= targetProfitMargin * 100) {
+                feasibilityScore = Math.min(100, 70 + (actualProfitPercent - targetProfitMargin * 100));
+                status = 'FEASIBLE';
+                if (actualProfitPercent > targetProfitMargin * 100 + 10) {
+                    recommendation = `Rate can be DECREASED by ${(actualProfitPercent - targetProfitMargin * 100).toFixed(1)}% while maintaining target margin`;
+                } else {
+                    recommendation = 'Rate is OPTIMAL - maintains healthy profit margin';
+                }
+            } else if (actualProfitPercent > 5) {
+                feasibilityScore = 30 + (actualProfitPercent / targetProfitMargin * 100) * 0.4;
+                status = 'MARGINAL';
+                const requiredIncrease = ((actualTotalCost * (1 + targetProfitMargin) - proposedRate) / proposedRate * 100);
+                recommendation = `Rate should INCREASE by ${requiredIncrease.toFixed(1)}% to meet target margin`;
+            } else {
+                feasibilityScore = Math.max(0, 30 * (actualProfitPercent / 5));
+                status = 'NOT FEASIBLE';
+                const requiredRate = actualTotalCost * (1 + targetProfitMargin);
+                recommendation = `Rate must INCREASE to ${requiredRate.toFixed(2)} SAR (${((requiredRate - proposedRate) / proposedRate * 100).toFixed(1)}% increase)`;
+            }
+            
+            document.getElementById('feasibilityScore').textContent = feasibilityScore.toFixed(0) + '%';
+            document.getElementById('feasibilityScore').className = 'feasibility-score ' + 
+                (feasibilityScore >= 70 ? 'feasible' : feasibilityScore >= 40 ? 'marginal' : 'not-feasible');
+            
+            document.getElementById('feasibilityStatus').textContent = status;
+            document.getElementById('recommendation').textContent = recommendation;
+            document.getElementById('recommendation').className = 'recommendation ' + 
+                (recommendation.includes('DECREASE') ? 'decrease' : recommendation.includes('OPTIMAL') ? 'maintain' : 'increase');
+            
+            document.getElementById('actualProfitMargin').textContent = actualProfitPercent.toFixed(1) + '%';
+            document.getElementById('costCoverage').textContent = costCoveragePercent.toFixed(0) + '%';
+            document.getElementById('productivityDisplay').textContent = productivityRate.toFixed(2) + ' ' + unit + '/hr';
+            document.getElementById('marketComparison').textContent = marketComparisonPercent.toFixed(0) + '%';
+            
+            const costData = [
+                { name: 'Direct Labor', amount: actualLaborCost, percent: (actualLaborCost / proposedRate * 100) },
+                { name: 'Supervision', amount: actualSupervisionCost, percent: (actualSupervisionCost / proposedRate * 100) },
+                { name: 'Materials', amount: actualMaterialCost, percent: (actualMaterialCost / proposedRate * 100) },
+                { name: 'Equipment', amount: actualEquipmentCost, percent: (actualEquipmentCost / proposedRate * 100) },
+                { name: 'Overhead', amount: actualOverhead, percent: (actualOverhead / proposedRate * 100) },
+                { name: 'Profit', amount: actualProfit, percent: (actualProfit / proposedRate * 100) }
+            ];
+            
+            const costBreakdownHtml = costData.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.amount.toFixed(2)}</td>
+                    <td>${item.percent.toFixed(1)}%</td>
+                    <td>${item.name === 'Profit' ? (actualProfitPercent >= targetProfitMargin * 100 ? '✅' : '⚠️') : '✅'}</td>
+                </tr>
+            `).join('') + `
+                <tr class="total-row">
+                    <td>Total</td>
+                    <td>${proposedRate.toFixed(2)}</td>
+                    <td>100.0%</td>
+                    <td>${feasibilityScore >= 70 ? '✅' : feasibilityScore >= 40 ? '⚠️' : '❌'}</td>
+                </tr>
+            `;
+            
+            document.getElementById('costBreakdown').innerHTML = costBreakdownHtml;
+            
+            const laborBreakdownHtml = `
+                <tr>
+                    <td>Scaffolder Labor (${crewSize} workers)</td>
+                    <td>${actualManhours.toFixed(2)}</td>
+                    <td>${laborRate.toFixed(2)}</td>
+                    <td>${actualLaborCost.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td>Supervision (15%)</td>
+                    <td>${(actualManhours * 0.15).toFixed(2)}</td>
+                    <td>${supervisorRate.toFixed(2)}</td>
+                    <td>${actualSupervisionCost.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="padding: 5px; background: #f0f0f0;">
+                        <strong>Productivity:</strong> ${productivityRate.toFixed(2)} ${unit} per hour with ${crewSize}-person crew
+                    </td>
+                </tr>
+                <tr class="total-row">
+                    <td>Total Labor</td>
+                    <td>${(actualManhours * 1.15).toFixed(2)}</td>
+                    <td>-</td>
+                    <td>${(actualLaborCost + actualSupervisionCost).toFixed(2)}</td>
+                </tr>
+            `;
+            
+            document.getElementById('laborBreakdown').innerHTML = laborBreakdownHtml;
+            
+            let messages = '';
+            
+            if (actualProfitPercent < 5) {
+                messages += `<div class="warning-box">
+                    <strong>⚠️ Critical:</strong> This rate results in only ${actualProfitPercent.toFixed(1)}% profit margin. 
+                    Risk of loss if there are any cost overruns or delays.
+                </div>`;
+            }
+            
+            if (marketComparisonPercent < 70) {
+                messages += `<div class="info-box">
+                    <strong>ℹ️ Market Position:</strong> Your rate is ${(100 - marketComparisonPercent).toFixed(0)}% below market rate. 
+                    This could win contracts but verify you can maintain quality at this price.
+                </div>`;
+            }
+            
+            messages += `<div class="info-box">
+                <strong>ℹ️ Crew Efficiency:</strong> With a ${crewSize}-person crew achieving ${productivityRate.toFixed(2)} ${unit} per manhour, 
+                your team completes ${(productivityRate * crewSize).toFixed(2)} ${unit} per hour.
+            </div>`;
+            
+            const totalQuantity = parseFloat(document.getElementById('totalQuantity').value);
+            if (totalQuantity > 0) {
+                const totalProjectCost = proposedRate * totalQuantity;
+                const totalProjectProfit = actualProfit * totalQuantity;
+                const totalManHours = actualManhours * totalQuantity;
+                const totalWorkDays = totalManHours / (8 * crewSize);
+                
+                messages += `<div class="success-box" style="background: #e8f5e9; border: 2px solid #4caf50; padding: 20px; margin-top: 20px;">
+                    <h3 style="color: #2e7d32; margin-bottom: 15px;">📊 Project Totals for ${totalQuantity.toFixed(2)} ${unit}</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #4caf50;">
+                            <td style="padding: 8px;"><strong>Total Project Value:</strong></td>
+                            <td style="padding: 8px; text-align: right; font-size: 1.2em; color: #2e7d32;"><strong>${totalProjectCost.toFixed(2)} SAR</strong></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #4caf50;">
+                            <td style="padding: 8px;">Total Labor Cost:</td>
+                            <td style="padding: 8px; text-align: right;">${(actualLaborCost * totalQuantity).toFixed(2)} SAR</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #4caf50;">
+                            <td style="padding: 8px;">Total Material Cost:</td>
+                            <td style="padding: 8px; text-align: right;">${(actualMaterialCost * totalQuantity).toFixed(2)} SAR</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #4caf50;">
+                            <td style="padding: 8px;">Total Equipment Cost:</td>
+                            <td style="padding: 8px; text-align: right;">${(actualEquipmentCost * totalQuantity).toFixed(2)} SAR</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #4caf50;">
+                            <td style="padding: 8px;">Total Overhead:</td>
+                            <td style="padding: 8px; text-align: right;">${(actualOverhead * totalQuantity).toFixed(2)} SAR</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #4caf50;">
+                            <td style="padding: 8px;"><strong>Total Project Profit:</strong></td>
+                            <td style="padding: 8px; text-align: right; color: #2e7d32;"><strong>${totalProjectProfit.toFixed(2)} SAR</strong></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #4caf50;">
+                            <td style="padding: 8px;">Total Man-hours Required:</td>
+                            <td style="padding: 8px; text-align: right;">${totalManHours.toFixed(2)} hours</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;">Estimated Work Days:</td>
+                            <td style="padding: 8px; text-align: right;">${totalWorkDays.toFixed(1)} days (with ${crewSize}-person crew)</td>
+                        </tr>
+                    </table>
+                </div>`;
+            }
+            
+            document.getElementById('analysisMessages').innerHTML = messages;
+            
+            drawCostChart(costData);
+            document.getElementById('resultsPanel').style.display = 'block';
+        }
+        
+        function drawCostChart(data) {
+            const canvas = document.getElementById('costChart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 120;
+            
+            const colors = ['#3498db', '#9b59b6', '#e74c3c', '#f39c12', '#95a5a6', '#27ae60'];
+            const total = data.reduce((sum, item) => sum + Math.max(0, item.amount), 0);
+            
+            let startAngle = -Math.PI / 2;
+            
+            data.forEach((item, index) => {
+                if (item.amount > 0) {
+                    const sliceAngle = (item.amount / total) * 2 * Math.PI;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[index % colors.length];
+                    ctx.fill();
+                    
+                    const labelAngle = startAngle + sliceAngle / 2;
+                    const labelX = centerX + Math.cos(labelAngle) * (radius + 40);
+                    const labelY = centerY + Math.sin(labelAngle) * (radius + 40);
+                    
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = labelX > centerX ? 'left' : 'right';
+                    ctx.fillText(`${item.name} (${item.percent.toFixed(0)}%)`, labelX, labelY);
+                    
+                    startAngle += sliceAngle;
+                }
+            });
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.3, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+        }
+        
+        function exportAnalysis() {
+            const scaffoldType = document.getElementById('scaffoldType');
+            const scaffoldName = scaffoldType.options[scaffoldType.selectedIndex].text;
+            const proposedRate = document.getElementById('proposedRate').value;
+            const feasibilityScore = document.getElementById('feasibilityScore').textContent;
+            const recommendation = document.getElementById('recommendation').textContent;
+            
+            let report = `SCAFFOLDING RATE FEASIBILITY ANALYSIS\n`;
+            report += `=====================================\n\n`;
+            report += `Date: ${new Date().toLocaleDateString()}\n`;
+            report += `Scaffold Type: ${scaffoldName}\n`;
+            report += `Proposed Rate: ${proposedRate} SAR\n`;
+            report += `Feasibility Score: ${feasibilityScore}\n\n`;
+            report += `RECOMMENDATION:\n${recommendation}\n`;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `RGS_Rate_Analysis_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function exportToExcel() {
+            const scaffoldType = document.getElementById('scaffoldType');
+            const scaffoldName = scaffoldType.options[scaffoldType.selectedIndex].text;
+            const unit = scaffoldType.value.split('|')[1];
+            const proposedRate = document.getElementById('proposedRate').value;
+            
+            let csvContent = "RGS Scaffolding Rate Analysis\n";
+            csvContent += `Date,${new Date().toLocaleDateString()}\n\n`;
+            csvContent += "PROJECT DETAILS\n";
+            csvContent += `Scaffold Type,${scaffoldName}\n`;
+            csvContent += `Unit,${unit}\n`;
+            csvContent += `Proposed Rate,${proposedRate},SAR\n\n`;
+            
+            csvContent += "COST BREAKDOWN\n";
+            csvContent += "Component,Amount (SAR),Percentage\n";
+            
+            const costRows = document.getElementById('costBreakdown').getElementsByTagName('tr');
+            for (let i = 0; i < costRows.length - 1; i++) {
+                const cells = costRows[i].getElementsByTagName('td');
+                csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent}\n`;
+            }
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `RGS_Analysis_${scaffoldName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Excel file downloaded successfully!');
+        }
+        
+        function exportToPDF() {
+            const printWindow = window.open('', '_blank');
+            const scaffoldName = document.getElementById('scaffoldType').options[document.getElementById('scaffoldType').selectedIndex].text;
+            const content = `
+                <html>
+                <head>
+                    <title>RGS Rate Analysis - ${scaffoldName}</title>
+                    <style>
+                        @media print { body { margin: 0; } }
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f8f9fa; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Scaffolding Rate Analysis</h1>
+                        <p>RESA GULF SCAFFOLDING</p>
+                        <p>${new Date().toLocaleString()}</p>
+                    </div>
+                    <h2>Analysis Results</h2>
+                    <p>The complete analysis has been generated. Use your browser's print function to save as PDF.</p>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(content);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                printWindow.print();
+            };
+        }
+        
+        window.onload = function() {
+            updateDefaults();
+        };
+    </script>
+</body>
+</html>
